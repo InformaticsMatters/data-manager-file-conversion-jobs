@@ -11,4 +11,4 @@ services:
   file-conversion-jobs:
     build:
       context: .
-    image: informaticsmatters/file-conversion-jobs:${IMAGE_TAG:-1.0.0}
+    image: informaticsmatters/file-conversion-jobs:${IMAGE_TAG:-1.0.1}

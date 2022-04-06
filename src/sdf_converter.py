@@ -6,41 +6,16 @@ import json
 import re
 import uuid
 import datetime
-import logging
-import os
 import gzip
 from typing import Any, Dict, List, Optional
 
+from dm_job_utilities.dm_log import DmLog
 
 _MIME_TYPE_MAP = {
     'chemical/x-mdl-sdfile': 'sdf',
     'application/x-squonk-dataset-molecule-v2+json': 'json',
     'application/schema+json': 'json_schema',
 }
-
-# Two loggers - one for basic logging, one for events.
-basic_logger = logging.getLogger('basic')
-basic_logger.setLevel(logging.INFO)
-basic_handler = logging.StreamHandler()
-basic_formatter = logging.Formatter('%(asctime)s # %(levelname)s %(message)s')
-basic_handler.setFormatter(basic_formatter)
-basic_logger.addHandler(basic_handler)
-
-event_logger = logging.getLogger('event')
-event_logger.setLevel(logging.INFO)
-event_handler = logging.StreamHandler()
-event_formatter = logging.Formatter('%(asctime)s # %(levelname)s -EVENT- %(message)s')
-event_handler.setFormatter(event_formatter)
-event_logger.addHandler(event_handler)
-
-# Get and display the environment material
-# (guaranteed to be provided)
-# using the basic (non-event) logger
-dataset_filename = os.getenv('DT_DATASET_FILENAME')
-dataset_input_path = os.getenv('DT_DATASET_INPUT_PATH')
-dataset_output_path = os.getenv('DT_DATASET_OUTPUT_PATH')
-dataset_output_format = os.getenv('DT_DATASET_OUTPUT_FORMAT')
-dataset_output_filename = os.getenv('DT_DATASET_OUTPUT_FILENAME')
 
 
 def is_number(value: str) -> int:
@@ -328,16 +303,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # format input file path and output file path.
-    basic_logger.info('SDF Converter')
-    event_logger.info('Processing %s...', args.input)
+    DmLog.emit_event(f'Processing {args.input}...')
 
     converter = ConvertFile()
     processed: bool = converter.convert(args.mime_type, args.input, args.output)
 
-    if processed:
-        basic_logger.info('SDF Converter finished successfully')
-    else:
-        basic_logger.info('SDF Converter failed')
+    if not processed:
+        DmLog.emit_event('errors=%s', converter.errors)
+        DmLog.emit_fatal_event('SDF Converter failed')
 
-    basic_logger.info('lines processes=%s', converter.lines)
-    basic_logger.info('errors=%s', converter.errors)
+    DmLog.emit_event(f'Done. lines processes={converter.lines}')

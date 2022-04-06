@@ -19,7 +19,7 @@ jobs:
     - sdf
     image:
       name: informaticsmatters/file-conversion-jobs
-      tag: '1.0.0'
+      tag: '1.0.1'
       project-directory: /data
       working-directory: /data
     command: >-
