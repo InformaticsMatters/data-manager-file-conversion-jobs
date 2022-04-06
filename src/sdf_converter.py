@@ -185,8 +185,8 @@ class ConvertFile:
         if infile.endswith('.gz'):
             file = gzip.open(infile, 'rt')
         else:
-            file = open(infile, 'rt')
-        outfile = open(outfile, 'w')
+            file = open(infile, 'rt', encoding='utf-8')
+        outfile = open(outfile, 'w', encoding='utf-8')
         outfile.write('[')
 
         try:
@@ -288,7 +288,7 @@ class ConvertFile:
         if infile.endswith('.gz'):
             file = gzip.open(infile, 'rt')
         else:
-            file = open(infile, 'rt')
+            file = open(infile, 'rt', encoding='utf-8')
 
         try:
             prop_types = self.process_properties_json(file)
@@ -311,7 +311,7 @@ class ConvertFile:
         }
 
         json_str: str = json.dumps(schema_sdf)
-        with open(outfile, 'w') as schema_file:
+        with open(outfile, 'w', encoding='utf-8') as schema_file:
             schema_file.write(json_str)
 
         if self.errors > 0:

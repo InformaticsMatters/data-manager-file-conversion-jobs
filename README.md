@@ -24,8 +24,14 @@ test everything's OK now with: -
 Use the Data Manager Job Tester ([jote]) to run tests against the job's
 definition, You will need to build the image first: -
 
+    pip install -r build-requirements.txt
+
     docker-compose build
     jote
+
+And make sure your code passes `pylint`: -
+
+    pylint src
 
 ---
 
