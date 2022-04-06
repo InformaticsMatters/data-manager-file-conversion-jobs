@@ -35,9 +35,9 @@ jobs:
         pip install -r build-requirements.txt
     - name: Lint
       run: |
-        pre-commit run--all-files
+        pre-commit run --all-files
         pylint src
     - name: Jote
-      run: jote --dry-run --allow-no-tests
+      run: jote --dry-run
     - name: Build
       run: docker-compose build

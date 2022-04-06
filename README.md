@@ -20,4 +20,14 @@ test everything's OK now with: -
 
     pre-commit run --all-files
 
+## Testing
+Use the Data Manager Job Tester ([jote]) to run tests against the job's
+definition, You will need to build the image first: -
+
+    docker-compose build
+    jote
+
 ---
+
+[pre-commit]: https://pre-commit.com
+[jote]: https://pypi.org/project/im-jote
