@@ -1,0 +1,6 @@
+**.pyc
+__pycache__
+.idea
+.mypy_cache
+
+data-manager/jote

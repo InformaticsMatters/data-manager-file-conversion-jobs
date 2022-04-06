@@ -1,0 +1,8 @@
+[messages control]
+
+# Disable some distracting checks.
+# See http://pylint.pycqa.org/en/latest/user_guide/message-control.html
+#
+# R : (Refactoring) warnings
+disable = consider-using-with,
+          too-many-function-args

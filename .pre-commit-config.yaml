@@ -1,0 +1,47 @@
+---
+default_language_version:
+  python: python3.10
+minimum_pre_commit_version: 2.18.1
+exclude: ^(docs|tests|example-data|migrations|unit-test-data|VERSION)
+
+repos:
+# Standard per-commit rules
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.1.0
+  hooks:
+  - id: check-case-conflict
+  - id: check-docstring-first
+  - id: check-executables-have-shebangs
+  - id: check-shebang-scripts-are-executable
+  - id: detect-private-key
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+    args:
+    - --markdown-linebreak-ext=md
+# Black (uncompromising) Python code formatter
+- repo: https://github.com/psf/black
+  rev: 22.3.0
+  hooks:
+  - id: black
+    language_version: python3.10
+    args:
+    - --skip-string-normalization
+# MyPy
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v0.942
+  hooks:
+  - id: mypy
+    files: ^src
+    args:
+    - --ignore-missing-imports
+    additional_dependencies:
+    - types-protobuf
+    - types-PyYAML
+    - types-python-dateutil
+    - types-pytz
+    - types-requests
+# YAML Lint
+- repo: https://github.com/adrienverge/yamllint
+  rev: v1.26.3
+  hooks:
+  - id: yamllint
