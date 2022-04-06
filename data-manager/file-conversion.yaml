@@ -54,9 +54,21 @@ jobs:
             title: The output MIME type
             type: str
     tests:
-      simple-execution:
+      compressed:
         inputs:
           inputFile: data/poses.sdf.gz
+        options:
+          outputFile: poses.json
+          mimeType: application/x-squonk-dataset-molecule-v2+json
+        checks:
+          exitCode: 0
+          outputs:
+          - name: poses.json
+            checks:
+            - exists: true
+      uncompressed:
+        inputs:
+          inputFile: data/poses.sdf
         options:
           outputFile: poses.json
           mimeType: application/x-squonk-dataset-molecule-v2+json
