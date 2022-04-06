@@ -3,12 +3,12 @@ version: '3.0'
 
 # Build and push with: -
 #
-# IMAGE_TAG=1.0.0 docker-compose build
-# IMAGE_TAG=1.0.0 docker-compose push
+# IMAGE_TAG=1.0.1 docker-compose build
+# IMAGE_TAG=1.0.1 docker-compose push
 
 services:
 
   file-conversion-jobs:
     build:
       context: .
-    image: informaticsmatters/file-conversion-jobs:${IMAGE_TAG:-latest}
+    image: informaticsmatters/file-conversion-jobs:${IMAGE_TAG:-1.0.0}
