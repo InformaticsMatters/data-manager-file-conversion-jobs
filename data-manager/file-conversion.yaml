@@ -53,6 +53,9 @@ jobs:
           mimeType:
             title: The output MIME type
             type: str
+            enum:
+            - application/x-squonk-dataset-molecule-v2+json
+            - application/schema+json
     tests:
       compressed-to-json:
         inputs:
@@ -72,6 +75,30 @@ jobs:
         options:
           outputFile: poses.json
           mimeType: application/x-squonk-dataset-molecule-v2+json
+        checks:
+          exitCode: 0
+          outputs:
+          - name: poses.json
+            checks:
+            - exists: true
+      compressed-to-schema:
+        inputs:
+          inputFile: data/poses.sdf.gz
+        options:
+          outputFile: poses.json
+          mimeType: application/schema+json
+        checks:
+          exitCode: 0
+          outputs:
+          - name: poses.json
+            checks:
+            - exists: true
+      uncompressed-to-schema:
+        inputs:
+          inputFile: data/poses.sdf
+        options:
+          outputFile: poses.json
+          mimeType: application/schema+json
         checks:
           exitCode: 0
           outputs:
