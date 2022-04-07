@@ -11,10 +11,9 @@ from typing import Any, Dict, List, Optional
 
 from dm_job_utilities.dm_log import DmLog
 
-_MIME_TYPE_MAP = {
-    'chemical/x-mdl-sdfile': 'sdf',
-    'application/x-squonk-dataset-molecule-v2+json': 'json',
-    'application/schema+json': 'json_schema',
+_OUTPUT_MIME_TYPES = {
+    "application/x-squonk-dataset-molecule-v2+json": "json",
+    "application/schema+json": "json_schema",
 }
 
 
@@ -37,9 +36,9 @@ def add_sdf_property(properties: Dict[str, str], propname: str, propvalue: List[
 
     if propvalue[len(propvalue) - 1]:
         # property block should end with an empty line, but some SDFs are buggy
-        properties[propname] = '\n'.join(propvalue)
+        properties[propname] = "\n".join(propvalue)
     else:
-        properties[propname] = '\n'.join(propvalue[:-1])
+        properties[propname] = "\n".join(propvalue[:-1])
 
 
 def check_name_in_properties(properties, prop_types):
@@ -67,10 +66,10 @@ class ConvertFile:
 
     def convert(self, to_mime_type: str, infile: str, outfile: str) -> bool:
         """Dispatch method"""
-        to_type: Optional[str] = _MIME_TYPE_MAP.get(to_mime_type)
+        to_type: Optional[str] = _OUTPUT_MIME_TYPES.get(to_mime_type)
         assert to_type
 
-        method_name = 'convert_sdf_to_' + str(to_type)
+        method_name = "convert_sdf_to_" + str(to_type)
         # Get the method from 'self'. Default to a lambda.
         method = getattr(self, method_name, lambda: "Invalid conversion")
         # Call the method as we return it
@@ -79,7 +78,7 @@ class ConvertFile:
     def process_molecules_json(self, file, outfile):
         """Process molecules in SDF file"""
 
-        pattern: str = '^>  <(.*)>'
+        pattern: str = "^>  <(.*)>"
         molecule = {}
         molblock = []
         properties: Dict[str, str] = {}
@@ -97,17 +96,17 @@ class ConvertFile:
                 break
 
             # remove newline chars
-            text = line.rstrip('\n\r')
+            text = line.rstrip("\n\r")
             molblock.append(text)
 
             # 'M  END' signifies the end of the molblock. The properties will follow
-            if text == 'M  END':
+            if text == "M  END":
                 propname = None
                 propvalue = []
                 if molblock[0]:
-                    molecule['name'] = molblock[0]
-                molblock = '\n'.join(molblock)
-                molecule['molblock'] = molblock
+                    molecule["name"] = molblock[0]
+                molblock = "\n".join(molblock)
+                molecule["molblock"] = molblock
 
                 # Loop through properties
                 while True:
@@ -122,19 +121,19 @@ class ConvertFile:
                     text = line.strip()
 
                     # '$$$$' signifies the end of the record
-                    if text == '$$$$':
+                    if text == "$$$$":
                         self.records += 1
                         if propname:
                             add_sdf_property(properties, propname, propvalue)
 
                         record = {
-                            'uuid': str(uuid.uuid4()),
-                            'molecule': molecule,
-                            'values': properties,
+                            "uuid": str(uuid.uuid4()),
+                            "molecule": molecule,
+                            "values": properties,
                         }
                         json_str = json.dumps(record)
                         if self.records > 1:
-                            outfile.write(',')
+                            outfile.write(",")
                         outfile.write(json_str)
 
                         molecule = {}
@@ -151,18 +150,18 @@ class ConvertFile:
                     else:
                         propvalue.append(text)
 
-        outfile.write(']')
+        outfile.write("]")
 
     def convert_sdf_to_json(self, infile, outfile) -> bool:
         """Converts the given SDF file into a Squonk json file.
         Returns True if file successfully converted.
         """
-        if infile.endswith('.gz'):
-            file = gzip.open(infile, 'rt')
+        if infile.endswith(".gz"):
+            file = gzip.open(infile, "rt")
         else:
-            file = open(infile, 'rt', encoding='utf-8')
-        outfile = open(outfile, 'w', encoding='utf-8')
-        outfile.write('[')
+            file = open(infile, "rt", encoding="utf-8")
+        outfile = open(outfile, "w", encoding="utf-8")
+        outfile.write("[")
 
         try:
             self.process_molecules_json(file, outfile)
@@ -176,7 +175,7 @@ class ConvertFile:
     def process_properties_json(self, file):
         """Process properties in SDF file"""
 
-        pattern = '^>  <(.*)>'
+        pattern = "^>  <(.*)>"
         properties = {}
         prop_types = {}
         # Loop through molecules
@@ -190,10 +189,10 @@ class ConvertFile:
             if not line:
                 break
             # remove newline chars
-            text = line.rstrip('\n\r')
+            text = line.rstrip("\n\r")
 
             # 'M  END' signifies the end of the molblock. The properties will follow
-            if text == 'M  END':
+            if text == "M  END":
                 propname = None
                 prop_value = []
 
@@ -209,7 +208,7 @@ class ConvertFile:
                     text = line.strip()
 
                     # '$$$$' signifies the end of the record
-                    if text == '$$$$':
+                    if text == "$$$$":
                         self.records += 1
                         if propname:
                             add_sdf_property(properties, propname, prop_value)
@@ -237,33 +236,33 @@ class ConvertFile:
         # sdf properties for internal json format.
         # Used in the json schema on internal conversion.
         _json_properties_sdf = {
-            'uuid': {'type': 'string', 'description': 'Unique UUID'},
-            'molecule': {
-                'type': 'object',
-                'properties': {
-                    'name': {'type': 'string', 'description': 'Molecule name'},
-                    'molblock': {
-                        'type': 'string',
-                        'description': 'Molfile format 2D or 3D representation',
+            "uuid": {"type": "string", "description": "Unique UUID"},
+            "molecule": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Molecule name"},
+                    "molblock": {
+                        "type": "string",
+                        "description": "Molfile format 2D or 3D representation",
                     },
-                    'isosmiles': {
-                        'type': 'string',
-                        'description': 'Isomeric SMILES representation',
+                    "isosmiles": {
+                        "type": "string",
+                        "description": "Isomeric SMILES representation",
                     },
-                    'stdsmiles': {
-                        'type': 'string',
-                        'description': 'Standardised non-isomeric SMILES representation',
+                    "stdsmiles": {
+                        "type": "string",
+                        "description": "Standardised non-isomeric SMILES representation",
                     },
                 },
             },
         }
-        _lookups = {0: 'string', 1: 'number', 2: 'integer'}
+        _lookups = {0: "string", 1: "number", 2: "integer"}
 
         # Extract the properties from the file
-        if infile.endswith('.gz'):
-            file = gzip.open(infile, 'rt')
+        if infile.endswith(".gz"):
+            file = gzip.open(infile, "rt")
         else:
-            file = open(infile, 'rt', encoding='utf-8')
+            file = open(infile, "rt", encoding="utf-8")
 
         try:
             prop_types = self.process_properties_json(file)
@@ -272,44 +271,45 @@ class ConvertFile:
 
         # Add the properties from the file to the schema
         values: Dict[str, Any] = {}
-        _json_properties_sdf['values'] = {'type': 'object', 'properties': values}
+        _json_properties_sdf["values"] = {"type": "object", "properties": values}
         for prop_name, prop_type in prop_types.items():
-            values[prop_name] = {'type': _lookups[prop_type]}
+            values[prop_name] = {"type": _lookups[prop_type]}
 
         schema_sdf = {
-            '$schema': 'http://json-schema.org/draft/2019-09/schema#',
-            'description': 'Automatically created from '
+            "$schema": "http://json-schema.org/draft/2019-09/schema#",
+            "description": "Automatically created from "
             + infile
-            + ' on '
+            + " on "
             + str(datetime.datetime.now()),
-            'properties': _json_properties_sdf,
+            "properties": _json_properties_sdf,
         }
 
         json_str: str = json.dumps(schema_sdf)
-        with open(outfile, 'w', encoding='utf-8') as schema_file:
+        with open(outfile, "w", encoding="utf-8") as schema_file:
             schema_file.write(json_str)
 
-        if self.errors > 0:
-            return False
-        return True
+        # Success if there are no errors
+        return self.errors == 0
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='SDF File Converter')
-    parser.add_argument('-i', '--input', help='Input file (SDF)')
-    parser.add_argument('-o', '--output', help='Output file')
-    parser.add_argument('-m', '--mime-type', help='Output MIME type')
+    parser = argparse.ArgumentParser(description="SDF File Converter")
+    parser.add_argument("-i", "--input", help="Input file (SDF)")
+    parser.add_argument("-o", "--output", help="Output file")
+    parser.add_argument("-m", "--mime-type", help="Output MIME type")
     args = parser.parse_args()
 
+    if args.mime_type not in _OUTPUT_MIME_TYPES:
+        DmLog.emit_fatal_event(f"Unsupported output type '{args.mime_type}'")
+
     # format input file path and output file path.
-    DmLog.emit_event(f'Processing {args.input}...')
+    DmLog.emit_event(f"Processing {args.input}...")
 
     converter = ConvertFile()
     processed: bool = converter.convert(args.mime_type, args.input, args.output)
 
     if not processed:
-        DmLog.emit_event('errors=%s', converter.errors)
-        DmLog.emit_fatal_event('SDF Converter failed')
+        DmLog.emit_fatal_event(f"SDF Converter failed (errors={converter.errors})")
 
-    DmLog.emit_event(f'Done. lines processes={converter.lines}')
+    DmLog.emit_event(f"Done. lines processes={converter.lines}")
