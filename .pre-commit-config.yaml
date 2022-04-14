@@ -1,10 +1,22 @@
 ---
-default_language_version:
-  python: python3.10
 minimum_pre_commit_version: 2.18.1
-exclude: ^(docs|tests|example-data|migrations|unit-test-data|VERSION)
 
 repos:
+
+# commit-msg hooks
+# ----------
+
+# Conventional Commit message checker (commitizen)
+- repo: https://github.com/commitizen-tools/commitizen
+  rev: v2.23.0
+  hooks:
+  - id: commitizen
+    stages:
+    - commit-msg
+
+# pre-commit hooks
+# ----------
+
 # Standard per-commit rules
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.1.0
