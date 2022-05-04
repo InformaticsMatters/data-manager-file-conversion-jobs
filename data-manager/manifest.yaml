@@ -3,4 +3,4 @@ kind: DataManagerManifest
 kind-version: '2021.1'
 
 job-definition-files:
-- file-conversion.yaml
+- im-file-conversion.yaml
